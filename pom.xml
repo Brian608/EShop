@@ -7,6 +7,13 @@
     <groupId>org.feather</groupId>
     <artifactId>EShop</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>Order-Serv</module>
+        <module>Product-Serv</module>
+        <module>User-Serv</module>
+        <module>Stock-Serv</module>
+        <module>ShopCart-Serv</module>
+    </modules>
     <packaging>pom</packaging>
 
     <description>电商父工程 所有子工程需要依赖此工程</description>
