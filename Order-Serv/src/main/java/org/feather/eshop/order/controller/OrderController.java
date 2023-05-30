@@ -1,4 +1,4 @@
-package org.feather.eshop.shopcart.order.controller;
+package org.feather.eshop.order.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +22,7 @@ public class OrderController {
 
     @GetMapping("/order/create")
     public String createOrder(Integer productId,Integer userId){
-        String result = restTemplate.getForObject("http://localhost/product/" + productId, String.class);
-        return  "用户"+userId +"购买了:"+result;
+       return restTemplate.getForObject("http://Stock-Serv/stock/reduce/"+productId,String.class);
     }
 
 }

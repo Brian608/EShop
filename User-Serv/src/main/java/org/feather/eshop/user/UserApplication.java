@@ -1,4 +1,4 @@
-package org.feather.eshop.shopcart.user;
+package org.feather.eshop.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

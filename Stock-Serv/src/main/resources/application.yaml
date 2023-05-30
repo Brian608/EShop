@@ -1,6 +1,11 @@
 
 server:
-  port: 11000
+  port: 8002
 spring:
   application:
     name: Stock-Serv
+  cloud:
+    nacos:
+      discovery:
+        service: ${spring.application.name}
+      server-addr: localhost:8848
