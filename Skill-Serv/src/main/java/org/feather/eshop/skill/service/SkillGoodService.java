@@ -1,0 +1,44 @@
+package org.feather.eshop.skill.service;
+
+import org.feather.eshop.skill.dao.SkillOrderRepository;
+import org.feather.eshop.skill.entity.SkillEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @projectName: EShop
+ * @package: org.feather.eshop.skill.service
+ * @className: SkillGoodService
+ * @author: feather
+ * @description: TODO
+ * @since: 2023-06-04 10:58
+ * @version: 1.0
+ */
+
+@Service
+public class SkillGoodService {
+    public static final String SKILL_GOODS_PHONE = "SKILL_GOODS_PHONE";
+    public static final String SKILL_GOODS_LIST = "SKILL_GOODS_LIST";
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private SkillOrderRepository skillOrderRepository;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private MutilThreadOrder mutilThreadOrder;
+
+    @Transactional
+    public void add(Long productId, String userId) throws Exception {
+        // 先封装对象 并且放入redis 队列
+        SkillEntity skillEntity=new SkillEntity();
+        skillEntity.setProductId(productId);
+        skillEntity.setUserId(userId);
+        redisTemplate.boundListOps(SKILL_GOODS_LIST).leftPush(skillEntity);
+        mutilThreadOrder.createOrder();
+
+    }
+}
