@@ -14,6 +14,7 @@
         <module>Stock-Serv</module>
         <module>ShopCart-Serv</module>
         <module>Skill-Serv</module>
+        <module>Ad-Serv</module>
     </modules>
     <packaging>pom</packaging>
 
