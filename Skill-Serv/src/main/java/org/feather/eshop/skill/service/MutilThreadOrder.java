@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+import static org.feather.eshop.skill.service.SkillGoodService.SKILL_GOODS_ONLY;
+import static org.feather.eshop.skill.service.SkillGoodService.SKILL_GOODS_QUEUE;
+
 /**
  * @projectName: EShop
  * @package: org.feather.eshop.skill.service
@@ -40,29 +43,27 @@ public class MutilThreadOrder {
         }
         Long productId = skillEntity.getProductId();
         String userId = skillEntity.getUserId();
-        Thread.sleep(10000);
         SkillGood skillGood = productService.getGoodById(productId);
         if (skillGood == null) {
             throw new Exception("商品已经被抢光拉");
         }
-        if (skillGood.getStockCount() > 0) {
-            SkillOrder skillOrder = new SkillOrder();
-            skillOrder.setMoney(skillGood.getCostPrice());
-            skillOrder.setPayTime(new Date());
-            skillOrder.setStatus("0");
-            skillOrder.setUserId(userId);
-            skillOrder.setCreateTime(new Date());
-            skillOrder.setSkillId(productId);
-            skillOrderRepository.save(skillOrder);
-            skillGood.setStockCount(skillGood.getStockCount() - 1);
-            redisTemplate.boundHashOps(SkillGoodService.SKILL_GOODS_PHONE).put(skillGood.getId(), skillGood);
-           log.info("成功秒杀 剩余库存：" + skillGood.getStockCount());
-        }
-        if (skillGood.getStockCount() <= 0) {
-           log.info("库存已经是负数了:" + skillGood.getStockCount());
+        Long stockId = (Long) redisTemplate.boundListOps(SKILL_GOODS_QUEUE + productId).rightPop();
+        if (stockId == null) {
+            System.out.println("该商品已被秒杀完毕");
+            redisTemplate.boundHashOps(SKILL_GOODS_ONLY).delete(userId);
             redisTemplate.boundHashOps(SkillGoodService.SKILL_GOODS_PHONE).delete(skillGood.getId());
+            skillGood.setStockCount(0);
             productService.update(skillGood);
+            return;
         }
+        SkillOrder skillOrder = new SkillOrder();
+        skillOrder.setMoney(skillGood.getCostPrice());
+        skillOrder.setPayTime(new Date());
+        skillOrder.setStatus("0");
+        skillOrder.setUserId(userId);
+        skillOrder.setCreateTime(new Date());
+        skillOrder.setSkillId(productId);
+        skillOrderRepository.save(skillOrder);
       log.info("结束异步抢单");
     }
 }
